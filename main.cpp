@@ -255,7 +255,6 @@ public:
 int pos;
 frac parseExpr(const char *s);
 frac parseTerm(const char *s);
-frac parseFactor(const char *s);
 frac parseAtom(const char *s);
 
 frac parseAtom(const char *s) {
@@ -342,25 +341,18 @@ frac parseAtom(const char *s) {
     return frac(term(sign * coef, xExp, sinExp, cosExp));
 }
 
-frac parseFactor(const char *s) {
+frac parseTerm(const char *s) {
     frac result = parseAtom(s);
 
-    while (s[pos] == '*') {
+    while (s[pos] == '*' || s[pos] == '/') {
+        char op = s[pos];
         pos++;
         frac right = parseAtom(s);
-        result = result * right;
-    }
-
-    return result;
-}
-
-frac parseTerm(const char *s) {
-    frac result = parseFactor(s);
-
-    while (s[pos] == '/') {
-        pos++;
-        frac right = parseFactor(s);
-        result = result / right;
+        if (op == '*') {
+            result = result * right;
+        } else {
+            result = result / right;
+        }
     }
 
     return result;
